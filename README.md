@@ -17,7 +17,7 @@ Live page: https://chiragmirani.github.io/compute-spot-index/
 
 - Vast.ai Search Offers API for public rental-market prices
 - Epoch AI, 'Frontier Data Centers'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/data/data-centers' [online resource].
-- Epoch AI data insight: "We estimate the cost breakdown for 60% of the total cost of ownership of a one-gigawatt AI data center"
+- Amelia Michael and Ben Cottier (2026), "Servers account for 60% of the total cost of ownership of a one-gigawatt AI data center". Published online at epoch.ai. Retrieved from 'https://epoch.ai/data-insights/ai-datacenter-cost-breakdown' [online resource]. Accessed 20 May 2026.
 
 ## Methodology
 

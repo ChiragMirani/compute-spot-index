@@ -15,7 +15,7 @@ Core formula:
 
 Reference context:
 - Epoch AI, "Frontier Data Centers". Published online at epoch.ai. Retrieved from "https://epoch.ai/data/data-centers" [online resource].
-- Epoch AI, "We estimate the cost breakdown for 60% of the total cost of ownership of a one-gigawatt AI data center". Published online at epoch.ai. Retrieved from "https://epoch.ai/data-insights/ai-datacenter-cost-breakdown" [online resource].
+- Amelia Michael and Ben Cottier (2026), "Servers account for 60% of the total cost of ownership of a one-gigawatt AI data center". Published online at epoch.ai. Retrieved from "https://epoch.ai/data-insights/ai-datacenter-cost-breakdown" [online resource]. Accessed 20 May 2026.
 
 Caveat:
 - These are public spot-market prices, not hyperscaler procurement costs or net operating margins. The estimates use a broad operating-cost assumption rather than site-specific contracts and still exclude financing structure, downtime, hardware replacement timing, and the risk that rental prices fall as supply expands.
