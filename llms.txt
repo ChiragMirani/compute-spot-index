@@ -2,20 +2,21 @@
 
 URL: https://chiragmirani.github.io/compute-spot-index/
 
-Compute Spot Index is a public AI compute price tracker. It summarizes public Vast.ai rental offers into median prices per graphics processor-hour, then translates those prices into rough annual value after operating costs and estimated present value for a 100,000-processor AI data center.
+Compute Spot Index is a public AI compute price tracker. It summarizes public Vast.ai rental offers into median prices per graphics processor-hour, then translates those prices into rough annual rental revenue, annual surplus after total annualized data center costs, and estimated present value for a 100,000-processor AI data center.
 
 Primary data:
 - Public Vast.ai rental offers, normalized to price per graphics processor-hour.
 - Saved public snapshot: https://chiragmirani.github.io/compute-spot-index/data/latest-public.json
 
 Core formula:
-- Annual value after operating costs = median hourly rental price * 100,000 graphics processors * 8,760 hours * 65% utilization - estimated annual operating costs.
-- Estimated annual operating costs use Epoch AI's $0.9 billion annual operating expense estimate for a one-gigawatt AI data center, scaled to a 120-megawatt proxy site: about $108 million per year.
-- Estimated present value after operating costs uses 10 years and a 10% to 15% discount rate.
+- Annual rental revenue = median hourly rental price * 100,000 graphics processors * 8,760 hours * 65% utilization.
+- Annual surplus after total annualized costs = annual rental revenue - scaled total annualized data center costs.
+- Scaled total annualized costs use Epoch AI's one-gigawatt annual cost model. The one-gigawatt total is about $8.5 billion per year; scaled to a 120-megawatt proxy site, this is about $1.0 billion per year.
+- Estimated present value of surplus uses 10 years and a 10% to 15% discount rate.
 
 Reference context:
 - Epoch AI, "Frontier Data Centers". Published online at epoch.ai. Retrieved from "https://epoch.ai/data/data-centers" [online resource].
 - Amelia Michael and Ben Cottier (2026), "Servers account for 60% of the total cost of ownership of a one-gigawatt AI data center". Published online at epoch.ai. Retrieved from "https://epoch.ai/data-insights/ai-datacenter-cost-breakdown" [online resource]. Accessed 20 May 2026.
 
 Caveat:
-- These are public spot-market prices, not hyperscaler procurement costs or net operating margins. The estimates use a broad operating-cost assumption rather than site-specific contracts and still exclude financing structure, downtime, hardware replacement timing, and the risk that rental prices fall as supply expands.
+- These are public spot-market prices, not hyperscaler procurement costs or net operating margins. The estimates use a stylized annualized cost stack rather than site-specific contracts and still exclude downtime, hardware replacement timing beyond Epoch's stylized lifespans, and the risk that rental prices fall as supply expands.
