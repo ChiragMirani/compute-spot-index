@@ -4,6 +4,8 @@ Compute Spot Index is a small public data page that tracks graphics processor re
 
 The core question is simple: if public spot markets price scarce AI compute at several dollars per graphics processor-hour, what does that imply about the value of dedicated data center capacity?
 
+Live page: https://chiragmirani.github.io/compute-spot-index/
+
 ## What The Page Shows
 
 - Median rental price per graphics processor-hour

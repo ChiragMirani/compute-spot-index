@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Compute Spot Index</title>
+    <title>Compute Spot Index | AI GPU Rental Prices</title>
     <meta
       name="description"
       content="A public GPU rental price index using Vast.ai market data to estimate annual gross value and present value for AI data center compute capacity."
@@ -22,20 +22,85 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://chiragmirani.github.io/compute-spot-index/" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="alternate" type="text/plain" title="LLMs.txt" href="https://chiragmirani.github.io/compute-spot-index/llms.txt" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Dataset",
-        "name": "Compute Spot Index",
-        "description": "A public graphics processor rental price index for estimating AI compute capacity economics.",
-        "creator": {
-          "@type": "Person",
-          "name": "Chirag Mirani"
-        },
-        "keywords": ["AI compute", "GPU rental prices", "data center valuation", "Vast.ai", "AI infrastructure"],
-        "isAccessibleForFree": true,
-        "license": "https://creativecommons.org/licenses/by/4.0/"
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://chiragmirani.github.io/compute-spot-index/#website",
+            "url": "https://chiragmirani.github.io/compute-spot-index/",
+            "name": "Compute Spot Index",
+            "publisher": {
+              "@type": "Person",
+              "name": "Chirag Mirani"
+            }
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://chiragmirani.github.io/compute-spot-index/#webpage",
+            "url": "https://chiragmirani.github.io/compute-spot-index/",
+            "name": "Compute Spot Index | AI GPU Rental Prices",
+            "description": "A public graphics processor rental price index using Vast.ai market data to estimate annual gross value and present value for AI data center compute capacity.",
+            "isPartOf": {
+              "@id": "https://chiragmirani.github.io/compute-spot-index/#website"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "Dataset",
+            "@id": "https://chiragmirani.github.io/compute-spot-index/#dataset",
+            "url": "https://chiragmirani.github.io/compute-spot-index/data/latest-public.json",
+            "name": "Compute Spot Index",
+            "description": "A public graphics processor rental price index for estimating AI compute capacity economics.",
+            "creator": {
+              "@type": "Person",
+              "name": "Chirag Mirani"
+            },
+            "keywords": ["AI compute", "GPU rental prices", "data center valuation", "Vast.ai", "AI infrastructure"],
+            "isAccessibleForFree": true,
+            "license": "https://creativecommons.org/licenses/by/4.0/",
+            "variableMeasured": ["median hourly rental price", "annual gross value", "estimated present value"],
+            "measurementTechnique": "Median public rentable Vast.ai offers with at least 90% host reliability, normalized to price per graphics processor-hour.",
+            "citation": [
+              "Vast.ai Search Offers API",
+              "Epoch AI, 'Frontier Data Centers'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/data/data-centers' [online resource].",
+              "Epoch AI, 'We estimate the cost breakdown for 60% of the total cost of ownership of a one-gigawatt AI data center'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/data-insights/ai-datacenter-cost-breakdown' [online resource]."
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://chiragmirani.github.io/compute-spot-index/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What does Compute Spot Index track?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Compute Spot Index tracks median public rental prices per graphics processor-hour for selected AI graphics processors."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How is data center value estimated?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Annual gross value equals median hourly rental price times 100,000 graphics processors times 8,760 hours times 65% utilization. Present value is estimated over 10 years using 10% to 15% discount rates."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Should frontier model trainers build their own data centers?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "For large organizations with sustained demand and high utilization, dedicated data center capacity can be economically preferable to renting spot-market graphics processors. The conclusion is sensitive to utilization, financing, depreciation, electricity, networking, and future rental prices."
+                }
+              }
+            ]
+          }
+        ]
       }
     </script>
     <style>
@@ -446,7 +511,7 @@
       <div class="shell">
         <nav class="nav">
           <div class="brand"><span class="mark" aria-hidden="true"></span><span>Compute Spot Index</span></div>
-          <span>Data explorer · Infrastructure · Compute markets</span>
+          <span>Data explorer | Infrastructure | Compute markets</span>
         </nav>
 
         <section class="hero">
@@ -513,7 +578,7 @@
               <strong>Cost analogy:</strong> Epoch estimates a typical one-gigawatt AI data center at <strong>$38 billion</strong> of up-front capital expenditure.
               A 100,000-processor site at 1.2 kilowatts of information-technology power per processor is about 120 megawatts, or roughly <strong>$4.6 billion</strong> if scaled from that one-gigawatt model.
               <div class="citation">
-                Citation for Epoch dataset: Epoch AI, 'Frontier Data Centers'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/data/data-centers-documentation' [online resource]. Accessed 20 May 2026.
+                Citation for Epoch dataset: Epoch AI, 'Frontier Data Centers'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/data/data-centers' [online resource]. Accessed 20 May 2026.
               </div>
             </div>
           </div>
