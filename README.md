@@ -9,8 +9,8 @@ Live page: https://chiragmirani.github.io/compute-spot-index/
 ## What The Page Shows
 
 - Median rental price per graphics processor-hour
-- Annual gross rental-market value for a 100,000-processor site
-- Estimated present value over 10 years using a 10%-15% discount rate
+- Annual rental-market value after estimated operating costs for a 100,000-processor site
+- Estimated present value after operating costs over 10 years using a 10%-15% discount rate
 - A cost analogy using Epoch AI's one-gigawatt AI data center cost estimate
 
 ## Data Sources
@@ -26,15 +26,18 @@ The public page uses the latest saved snapshot in `data/latest-public.json`.
 For each graphics processor type:
 
 ```text
-annual gross value =
+annual value after operating costs =
 median hourly rental price * 100,000 processors * 8,760 hours * 65% utilization
+- estimated annual operating costs
 ```
 
-Present value is calculated over 10 years using discount rates from 10% to 15%.
+Estimated annual operating costs use Epoch AI's $0.9 billion annual operating expense estimate for a one-gigawatt AI data center, scaled to a 120-megawatt proxy site: about $108 million per year.
+
+Present value is calculated after operating costs over 10 years using discount rates from 10% to 15%.
 
 ## Caveats
 
-These are public spot-market prices, not hyperscaler procurement costs or net margins. The calculation excludes electricity, maintenance, financing, networking, downtime, taxes, hardware replacement, and the risk that rental prices fall as graphics processor supply expands.
+These are public spot-market prices, not hyperscaler procurement costs or net margins. The calculation uses a broad operating-cost estimate rather than site-specific electricity, maintenance, staffing, taxes, and networking contracts. It still excludes financing structure, downtime, hardware replacement timing, and the risk that rental prices fall as graphics processor supply expands.
 
 ## Local Live Refresh
 

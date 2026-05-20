@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Compute Spot Index | AI GPU Rental Prices</title>
+    <title>Compute Spot Index | AI Graphics Processor Rental Prices</title>
     <meta
       name="description"
-      content="A public GPU rental price index using Vast.ai market data to estimate annual gross value and present value for AI data center compute capacity."
+      content="A public graphics processor rental price index using Vast.ai market data to estimate annual value after operating costs and present value for AI data center compute capacity."
     />
     <meta
       name="keywords"
@@ -43,8 +43,8 @@
             "@type": "WebPage",
             "@id": "https://chiragmirani.github.io/compute-spot-index/#webpage",
             "url": "https://chiragmirani.github.io/compute-spot-index/",
-            "name": "Compute Spot Index | AI GPU Rental Prices",
-            "description": "A public graphics processor rental price index using Vast.ai market data to estimate annual gross value and present value for AI data center compute capacity.",
+            "name": "Compute Spot Index | AI Graphics Processor Rental Prices",
+            "description": "A public graphics processor rental price index using Vast.ai market data to estimate annual value after operating costs and present value for AI data center compute capacity.",
             "isPartOf": {
               "@id": "https://chiragmirani.github.io/compute-spot-index/#website"
             },
@@ -63,7 +63,7 @@
             "keywords": ["AI compute", "GPU rental prices", "data center valuation", "Vast.ai", "AI infrastructure"],
             "isAccessibleForFree": true,
             "license": "https://creativecommons.org/licenses/by/4.0/",
-            "variableMeasured": ["median hourly rental price", "annual gross value", "estimated present value"],
+            "variableMeasured": ["median hourly rental price", "annual value after operating costs", "estimated present value after operating costs"],
             "measurementTechnique": "Median public rentable Vast.ai offers with at least 90% host reliability, normalized to price per graphics processor-hour.",
             "citation": [
               "Vast.ai Search Offers API",
@@ -88,7 +88,7 @@
                 "name": "How is data center value estimated?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Annual gross value equals median hourly rental price times 100,000 graphics processors times 8,760 hours times 65% utilization. Present value is estimated over 10 years using 10% to 15% discount rates."
+                  "text": "Annual value after operating costs equals median hourly rental price times 100,000 graphics processors times 8,760 hours times 65% utilization, minus estimated annual operating costs. Present value is estimated over 10 years using 10% to 15% discount rates."
                 }
               },
               {
@@ -557,8 +557,8 @@
                 <tr>
                   <th>Graphics processor</th>
                   <th>Median price<br />per processor-hour</th>
-                  <th>Annual gross value<br />for 100,000 processors</th>
-                  <th>Estimated present value<br />over 10 years</th>
+                  <th>Annual value<br />after operating cost</th>
+                  <th>Estimated present value<br />after operating cost</th>
                 </tr>
               </thead>
               <tbody id="priceRows"></tbody>
@@ -576,8 +576,8 @@
           <div class="note">
             <div class="note-block" id="valuationNote">Loading valuation note...</div>
             <div class="note-block">
-              <strong>Cost analogy:</strong> Epoch estimates a typical one-gigawatt AI data center at <strong>$38 billion</strong> of up-front capital expenditure.
-              A 100,000-processor site at 1.2 kilowatts of information-technology power per processor is about 120 megawatts, or roughly <strong>$4.6 billion</strong> if scaled from that one-gigawatt model.
+              <strong>Cost analogy:</strong> Epoch estimates a typical one-gigawatt AI data center at <strong>$38 billion</strong> of up-front capital expenditure and <strong>$0.9 billion</strong> of annual operating expenses.
+              A 100,000-processor site at 1.2 kilowatts of information-technology power per processor is about 120 megawatts, or roughly <strong>$4.6 billion</strong> of scaled up-front cost and <strong>$108 million per year</strong> of scaled operating cost.
               <div class="citation">
                 Citation for Epoch dataset: Epoch AI, 'Frontier Data Centers'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/data/data-centers' [online resource]. Accessed 20 May 2026.
               </div>
@@ -597,6 +597,15 @@
       const apiKeyInput = document.getElementById("apiKeyInput");
       const saveKeyButton = document.getElementById("saveKeyButton");
       const isLocalServer = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+      const graphicsProcessorCount = 100000;
+      const hoursPerYear = 8760;
+      const utilization = 0.65;
+      const valuationYears = 10;
+      const lowDiscountRate = 0.15;
+      const highDiscountRate = 0.10;
+      const siteInformationTechnologyPowerMegawatts = 120;
+      const epochOneGigawattOperatingCost = 900000000;
+      const annualOperatingCost = epochOneGigawattOperatingCost * (siteInformationTechnologyPowerMegawatts / 1000);
 
       async function loadPrices() {
         errorBox.style.display = "none";
@@ -623,9 +632,9 @@
 
         priceRows.innerHTML = rows
           .map((row) => {
-            const annualValue = annualGrossValue(row.median_price);
-            const presentValueLow = presentValue(annualValue, 0.15, 10);
-            const presentValueHigh = presentValue(annualValue, 0.10, 10);
+            const annualValue = annualValueAfterOperatingCost(row.median_price);
+            const presentValueLow = presentValue(annualValue, lowDiscountRate, valuationYears);
+            const presentValueHigh = presentValue(annualValue, highDiscountRate, valuationYears);
             return `
               <tr>
                 <td class="gpu-name">${row.gpu}</td>
@@ -640,20 +649,23 @@
         const b200 = rows.find((row) => row.gpu === "B200");
 
         if (b200 && b200.median_price) {
-          const annual100k = b200.median_price * 100000 * 8760 * 0.65;
-          const presentValueAtTenPercent = presentValue(annual100k, 0.10, 10);
-          const presentValueAtFifteenPercent = presentValue(annual100k, 0.15, 10);
+          const annualGross100k = annualGrossValue(b200.median_price);
+          const annualAfterOperatingCost = annualValueAfterOperatingCost(b200.median_price);
+          const presentValueAtTenPercent = presentValue(annualAfterOperatingCost, highDiscountRate, valuationYears);
+          const presentValueAtFifteenPercent = presentValue(annualAfterOperatingCost, lowDiscountRate, valuationYears);
           valuationNote.innerHTML = `
             <strong>Valuation hook:</strong> at the current B200 median of <strong>${formatCurrency(b200.median_price)} per graphics processor-hour</strong>,
-            a 100,000 graphics processor data center has gross rental-market value of about <strong>${formatCompactMoney(annual100k)} per year</strong>.
-            Discounted over ten years, that implies a gross present value, or current estimated market value, of roughly <strong>${formatCompactMoney(presentValueAtFifteenPercent)}-${formatCompactMoney(presentValueAtTenPercent)}</strong>.
+            a 100,000 graphics processor data center has rental-market value of about <strong>${formatCompactMoney(annualGross100k)} per year</strong> before operating costs.
+            After deducting estimated operating costs of <strong>${formatCompactMoney(annualOperatingCost)} per year</strong>, annual value is about <strong>${formatCompactMoney(annualAfterOperatingCost)} per year</strong>.
+            Discounted over ten years, that implies a present value, or current estimated market value, of roughly <strong>${formatCompactMoney(presentValueAtFifteenPercent)}-${formatCompactMoney(presentValueAtTenPercent)}</strong>.
             Compared with the roughly <strong>$4.6 billion</strong> scaled cost analogy from Epoch's one-gigawatt model, building or leasing compute capacity to rent out still looks economically attractive if high utilization and spot prices persist.
             <div class="assumption-list">
-              <div class="assumption-line"><span>Graphics processors</span><strong>100,000</strong></div>
-              <div class="assumption-line"><span>Utilization</span><strong>65%</strong></div>
-              <div class="assumption-line"><span>Horizon</span><strong>10 years</strong></div>
+              <div class="assumption-line"><span>Graphics processors</span><strong>${formatNumber(graphicsProcessorCount)}</strong></div>
+              <div class="assumption-line"><span>Utilization</span><strong>${formatPercent(utilization)}</strong></div>
+              <div class="assumption-line"><span>Operating cost</span><strong>${formatCompactMoney(annualOperatingCost)} per year</strong></div>
+              <div class="assumption-line"><span>Horizon</span><strong>${valuationYears} years</strong></div>
               <div class="assumption-line"><span>Discount rate</span><strong>10%-15%</strong></div>
-              <div class="assumption-line"><span>Annual value formula</span><strong>hourly price * graphics processors * 8,760 hours * utilization</strong></div>
+              <div class="assumption-line"><span>Annual value formula</span><strong>hourly price * graphics processors * 8,760 hours * utilization - operating cost</strong></div>
             </div>
           `;
         } else {
@@ -695,6 +707,11 @@
         return new Date(value).toLocaleString();
       }
 
+      function formatPercent(value) {
+        if (!Number.isFinite(Number(value))) return "-";
+        return `${Math.round(Number(value) * 100)}%`;
+      }
+
       function presentValue(annualCashFlow, discountRate, years) {
         let total = 0;
         for (let year = 1; year <= years; year += 1) {
@@ -705,7 +722,11 @@
 
       function annualGrossValue(medianPrice) {
         if (!Number.isFinite(Number(medianPrice))) return NaN;
-        return Number(medianPrice) * 100000 * 8760 * 0.65;
+        return Number(medianPrice) * graphicsProcessorCount * hoursPerYear * utilization;
+      }
+
+      function annualValueAfterOperatingCost(medianPrice) {
+        return annualGrossValue(medianPrice) - annualOperatingCost;
       }
 
       async function saveKey() {
