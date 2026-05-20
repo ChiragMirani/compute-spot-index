@@ -1,0 +1,46 @@
+{
+  "timestamp": "2026-05-20T16:07:40+00:00",
+  "source": "Vast.ai Search Offers API",
+  "assumptions": {
+    "rentable": true,
+    "price_basis": "per graphics processor-hour",
+    "minimum_host_reliability": "90%",
+    "rental_type": "on-demand",
+    "site_size": "100,000 graphics processors",
+    "utilization": "65%",
+    "discount_rate": "10%-15%",
+    "horizon": "10 years"
+  },
+  "rows": [
+    {
+      "gpu": "B200",
+      "offers": 19,
+      "median_price": 5.0003472222222225
+    },
+    {
+      "gpu": "H100 SXM",
+      "offers": 22,
+      "median_price": 2.6414814814814815
+    },
+    {
+      "gpu": "H100 NVL",
+      "offers": 1,
+      "median_price": 2.908888888888889
+    },
+    {
+      "gpu": "A100 80GB",
+      "offers": 35,
+      "median_price": 1.0695555555555556
+    },
+    {
+      "gpu": "A100 40GB",
+      "offers": 18,
+      "median_price": 0.8939814814814814
+    },
+    {
+      "gpu": "RTX 5090",
+      "offers": 63,
+      "median_price": 0.6007407407407407
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+server-error.log
+server-out.log
+.env
+data/snapshots.jsonl
+data/latest.json
+reference/epoch-home.html

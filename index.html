@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compute Spot Index</title>
+    <meta
+      name="description"
+      content="A public GPU rental price index using Vast.ai market data to estimate annual gross value and present value for AI data center compute capacity."
+    />
+    <meta
+      name="keywords"
+      content="AI compute, GPU rental prices, B200 price, H100 price, data center valuation, Vast.ai, AI infrastructure, compute economics"
+    />
+    <meta name="author" content="Chirag Mirani" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://chiragmirani.github.io/compute-spot-index/" />
+    <meta property="og:title" content="Compute Spot Index" />
+    <meta
+      property="og:description"
+      content="Track public graphics processor rental prices and translate them into AI data center value estimates."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chiragmirani.github.io/compute-spot-index/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": "Compute Spot Index",
+        "description": "A public graphics processor rental price index for estimating AI compute capacity economics.",
+        "creator": {
+          "@type": "Person",
+          "name": "Chirag Mirani"
+        },
+        "keywords": ["AI compute", "GPU rental prices", "data center valuation", "Vast.ai", "AI infrastructure"],
+        "isAccessibleForFree": true,
+        "license": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    </script>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --surface: #ffffff;
+        --ink: #02060a;
+        --muted: #44505c;
+        --faint: #6a7680;
+        --line: #dfe8ed;
+        --soft: #f7f8f8;
+        --black: #02060a;
+        --teal: #22aeb0;
+        --pink: #df4a9a;
+        --blue: #007d94;
+        --green: #1f7a4d;
+        --red: #a83d31;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .app {
+        min-height: 100vh;
+        padding: 32px 24px 56px;
+      }
+
+      .shell {
+        max-width: 1040px;
+        margin: 0 auto;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 40px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--ink);
+        font-weight: 760;
+      }
+
+      .mark {
+        width: 22px;
+        height: 22px;
+        border: 1px solid var(--ink);
+        border-radius: 50%;
+        background:
+          linear-gradient(90deg, transparent 47%, var(--ink) 47% 53%, transparent 53%),
+          linear-gradient(0deg, transparent 47%, var(--ink) 47% 53%, transparent 53%);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin-bottom: 28px;
+      }
+
+      .headline,
+      .model {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+      }
+
+      .headline {
+        padding: 0;
+      }
+
+      .eyebrow {
+        margin-bottom: 14px;
+        color: var(--faint);
+        font-size: 13px;
+        font-weight: 720;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 760px;
+        font-size: clamp(42px, 6vw, 64px);
+        line-height: 1.08;
+        letter-spacing: 0;
+        font-weight: 800;
+      }
+
+      .sub {
+        max-width: 710px;
+        margin-top: 52px;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.45;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      button {
+        min-height: 36px;
+        border: 1px solid var(--black);
+        border-radius: 8px;
+        background: var(--black);
+        color: #fff;
+        font: inherit;
+        font-weight: 680;
+        padding: 0 18px;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.62;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--soft);
+        color: var(--muted);
+        padding: 0 12px;
+        font-size: 13px;
+      }
+
+      .model {
+        display: grid;
+        align-content: space-between;
+        gap: 20px;
+        padding: 18px 0 4px;
+        border-top: 1px solid var(--line);
+      }
+
+      .model h2 {
+        font-size: 15px;
+      }
+
+      .formula {
+        display: grid;
+        gap: 10px;
+      }
+
+      .formula-row {
+        display: grid;
+        grid-template-columns: 88px minmax(0, 1fr);
+        gap: 12px;
+        align-items: baseline;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .formula-row strong {
+        color: var(--ink);
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--surface);
+      }
+
+      .panel {
+        overflow: hidden;
+        margin-bottom: 34px;
+        border-left: 0;
+        border-right: 0;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .panel-head h2 {
+        margin-bottom: 4px;
+        font-size: 18px;
+      }
+
+      .timestamp {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        border: 1px solid #cde6e8;
+        border-radius: 8px;
+        background: #eef8f8;
+        color: #007d84;
+        padding: 0 10px;
+        font-size: 12px;
+        font-weight: 760;
+      }
+
+      table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 18px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: right;
+        white-space: normal;
+        vertical-align: middle;
+      }
+
+      th:first-child,
+      td:first-child {
+        text-align: left;
+      }
+
+      th {
+        background: var(--soft);
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.25;
+        font-weight: 760;
+        text-transform: uppercase;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      tbody tr:hover {
+        background: #fbfaf7;
+      }
+
+      .gpu-name {
+        font-weight: 790;
+      }
+
+      .price-cell {
+        font-size: 22px;
+        font-weight: 780;
+        color: var(--teal);
+        white-space: nowrap;
+      }
+
+      .money-cell {
+        white-space: nowrap;
+      }
+
+      .bar-cell {
+        min-width: 190px;
+      }
+
+      .bar-track {
+        height: 10px;
+        border-radius: 999px;
+        background: #e6eef1;
+        overflow: hidden;
+      }
+
+      .bar {
+        height: 100%;
+        border-radius: inherit;
+        background: var(--teal);
+      }
+
+      .note {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: var(--line);
+        border-top: 1px solid var(--line);
+      }
+
+      .note-block {
+        min-height: 132px;
+        background: var(--surface);
+        padding: 20px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.5;
+      }
+
+      .note-block strong {
+        color: var(--ink);
+      }
+
+      .citation {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .assumption-list {
+        display: grid;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .assumption-line {
+        display: grid;
+        grid-template-columns: 135px minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      .error {
+        display: none;
+        margin-bottom: 18px;
+        border: 1px solid rgba(187, 56, 47, 0.35);
+        border-radius: 8px;
+        background: #fff7f6;
+        color: var(--red);
+        padding: 13px 15px;
+      }
+
+      .key-panel {
+        display: none;
+        margin-bottom: 22px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        padding: 16px 0;
+      }
+
+      .key-panel.visible {
+        display: block;
+      }
+
+      .key-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .key-row input {
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 11px;
+        font: inherit;
+      }
+
+      @media (max-width: 980px) {
+        .hero,
+        .note {
+          grid-template-columns: 1fr;
+        }
+
+        .table-wrap {
+          overflow-x: auto;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .app {
+          padding: 14px;
+        }
+
+        .headline {
+          padding: 22px;
+        }
+
+        .hero-actions,
+        .panel-head {
+          align-items: stretch;
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <div class="shell">
+        <nav class="nav">
+          <div class="brand"><span class="mark" aria-hidden="true"></span><span>Compute Spot Index</span></div>
+          <span>Data explorer · Infrastructure · Compute markets</span>
+        </nav>
+
+        <section class="hero">
+          <div class="headline">
+            <p class="eyebrow">Data explorer</p>
+            <h1>Investigating the spot price of AI compute.</h1>
+            <p class="sub">
+              Daily public rental offers by chip type, summarized into a compact price index for valuing scarce graphics processor capacity and interpreting data-center buildout economics.
+            </p>
+            <p class="sub">
+              Current public rental prices suggest that for a large frontier model trainer with sustained demand, building or leasing dedicated data center capacity can be economically preferable to renting graphics processors at spot-market prices. The case is strongest when utilization is high, financing is available, and the organization can keep the cluster busy with training, post-training, inference, and experiments; it is weaker for short-lived or uncertain workloads because graphics processors depreciate quickly and rental prices can fall as supply expands.
+            </p>
+            <div class="hero-actions">
+              <span class="status-pill" id="timestamp">Loading latest snapshot...</span>
+            </div>
+          </div>
+        </section>
+
+        <div id="errorBox" class="error"></div>
+
+        <section id="keyPanel" class="key-panel">
+          <p class="timestamp">
+            Paste a Vast.ai API key to fetch live prices. It is sent only to this local server at 127.0.0.1 and kept in memory for this session.
+          </p>
+          <div class="key-row">
+            <input id="apiKeyInput" type="password" autocomplete="off" placeholder="Vast.ai API key" />
+            <button id="saveKeyButton" type="button">Use Key</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Current Spot Prices</h2>
+              <p class="timestamp">Rentable on-demand offers with at least 90% host reliability. Multi-processor listings are normalized to price per graphics processor-hour.</p>
+            </div>
+            <span class="chip" id="sourceLabel">Vast.ai</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Graphics processor</th>
+                  <th>Median price<br />per processor-hour</th>
+                  <th>Annual gross value<br />for 100,000 processors</th>
+                  <th>Estimated present value<br />over 10 years</th>
+                </tr>
+              </thead>
+              <tbody id="priceRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Interpretation</h2>
+              <p class="timestamp">A public price signal for compute scarcity and graphics processor capacity valuation.</p>
+            </div>
+          </div>
+          <div class="note">
+            <div class="note-block" id="valuationNote">Loading valuation note...</div>
+            <div class="note-block">
+              <strong>Cost analogy:</strong> Epoch estimates a typical one-gigawatt AI data center at <strong>$38 billion</strong> of up-front capital expenditure.
+              A 100,000-processor site at 1.2 kilowatts of information-technology power per processor is about 120 megawatts, or roughly <strong>$4.6 billion</strong> if scaled from that one-gigawatt model.
+              <div class="citation">
+                Citation for Epoch dataset: Epoch AI, 'Frontier Data Centers'. Published online at epoch.ai. Retrieved from 'https://epoch.ai/data/data-centers-documentation' [online resource]. Accessed 20 May 2026.
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const errorBox = document.getElementById("errorBox");
+      const priceRows = document.getElementById("priceRows");
+      const timestamp = document.getElementById("timestamp");
+      const sourceLabel = document.getElementById("sourceLabel");
+      const valuationNote = document.getElementById("valuationNote");
+      const keyPanel = document.getElementById("keyPanel");
+      const apiKeyInput = document.getElementById("apiKeyInput");
+      const saveKeyButton = document.getElementById("saveKeyButton");
+      const isLocalServer = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+
+      async function loadPrices() {
+        errorBox.style.display = "none";
+        try {
+          const endpoint = isLocalServer ? "/api/latest?auto=1" : "data/latest-public.json";
+          const response = await fetch(endpoint);
+          const payload = await response.json();
+          if (!response.ok || payload.error) {
+            showError(payload.error || "Could not refresh prices. Showing sample data.");
+            render(payload.sample || payload);
+          } else {
+            render(payload);
+          }
+        } catch (error) {
+          showError(error.message);
+        }
+      }
+
+      function render(payload) {
+        const rows = (payload.rows || []).filter((row) => row.median_price != null);
+        const maxMedian = Math.max(...rows.map((row) => Number(row.median_price || 0)), 1);
+        timestamp.textContent = `Snapshot: ${formatDate(payload.timestamp)}`;
+        sourceLabel.textContent = payload.source && payload.source.includes("Sample") ? "Sample data" : "Vast.ai API";
+
+        priceRows.innerHTML = rows
+          .map((row) => {
+            const annualValue = annualGrossValue(row.median_price);
+            const presentValueLow = presentValue(annualValue, 0.15, 10);
+            const presentValueHigh = presentValue(annualValue, 0.10, 10);
+            return `
+              <tr>
+                <td class="gpu-name">${row.gpu}</td>
+                <td class="price-cell">${formatCurrency(row.median_price)}</td>
+                <td class="money-cell">${formatCompactMoney(annualValue)} per year</td>
+                <td class="money-cell">${formatCompactMoney(presentValueLow)}-${formatCompactMoney(presentValueHigh)}</td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        const b200 = rows.find((row) => row.gpu === "B200");
+
+        if (b200 && b200.median_price) {
+          const annual100k = b200.median_price * 100000 * 8760 * 0.65;
+          const presentValueAtTenPercent = presentValue(annual100k, 0.10, 10);
+          const presentValueAtFifteenPercent = presentValue(annual100k, 0.15, 10);
+          valuationNote.innerHTML = `
+            <strong>Valuation hook:</strong> at the current B200 median of <strong>${formatCurrency(b200.median_price)} per graphics processor-hour</strong>,
+            a 100,000 graphics processor data center has gross rental-market value of about <strong>${formatCompactMoney(annual100k)} per year</strong>.
+            Discounted over ten years, that implies a gross present value, or current estimated market value, of roughly <strong>${formatCompactMoney(presentValueAtFifteenPercent)}-${formatCompactMoney(presentValueAtTenPercent)}</strong>.
+            Compared with the roughly <strong>$4.6 billion</strong> scaled cost analogy from Epoch's one-gigawatt model, building or leasing compute capacity to rent out still looks economically attractive if high utilization and spot prices persist.
+            <div class="assumption-list">
+              <div class="assumption-line"><span>Graphics processors</span><strong>100,000</strong></div>
+              <div class="assumption-line"><span>Utilization</span><strong>65%</strong></div>
+              <div class="assumption-line"><span>Horizon</span><strong>10 years</strong></div>
+              <div class="assumption-line"><span>Discount rate</span><strong>10%-15%</strong></div>
+              <div class="assumption-line"><span>Annual value formula</span><strong>hourly price * graphics processors * 8,760 hours * utilization</strong></div>
+            </div>
+          `;
+        } else {
+          valuationNote.textContent = "Refresh with a Vast.ai API key to compute the B200 valuation hook.";
+        }
+
+        if (payload.refresh_error) {
+          showError(`Could not update from Vast.ai, showing last saved data. ${payload.refresh_error}`);
+          if (isLocalServer) keyPanel.classList.add("visible");
+        } else {
+          keyPanel.classList.remove("visible");
+        }
+      }
+
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.style.display = "block";
+      }
+
+      function formatCurrency(value) {
+        if (value == null || Number.isNaN(Number(value))) return "-";
+        return `$${Number(value).toFixed(2)}`;
+      }
+
+      function formatCompactMoney(value) {
+        if (!Number.isFinite(value)) return "-";
+        if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
+        if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
+        return `$${Math.round(value).toLocaleString()}`;
+      }
+
+      function formatNumber(value, digits = 0) {
+        if (value == null || Number.isNaN(Number(value))) return "-";
+        return Number(value).toLocaleString(undefined, { maximumFractionDigits: digits });
+      }
+
+      function formatDate(value) {
+        if (!value) return "-";
+        return new Date(value).toLocaleString();
+      }
+
+      function presentValue(annualCashFlow, discountRate, years) {
+        let total = 0;
+        for (let year = 1; year <= years; year += 1) {
+          total += annualCashFlow / (1 + discountRate) ** year;
+        }
+        return total;
+      }
+
+      function annualGrossValue(medianPrice) {
+        if (!Number.isFinite(Number(medianPrice))) return NaN;
+        return Number(medianPrice) * 100000 * 8760 * 0.65;
+      }
+
+      async function saveKey() {
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey) {
+          showError("Paste a Vast.ai API key first.");
+          return;
+        }
+        saveKeyButton.disabled = true;
+        saveKeyButton.textContent = "Saving...";
+        try {
+          const response = await fetch("/api/key", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ apiKey }),
+          });
+          const payload = await response.json();
+          if (!response.ok || payload.error) throw new Error(payload.error || "Could not save key.");
+          apiKeyInput.value = "";
+          keyPanel.classList.remove("visible");
+          await loadPrices();
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          saveKeyButton.disabled = false;
+          saveKeyButton.textContent = "Use Key";
+        }
+      }
+
+      saveKeyButton.addEventListener("click", saveKey);
+      apiKeyInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") saveKey();
+      });
+      loadPrices();
+
+      if (window.location.protocol === "file:") {
+        showError("Open this through the local server instead: http://127.0.0.1:8788. The file:// page cannot call the Vast.ai backend.");
+      }
+    </script>
+  </body>
+</html>
