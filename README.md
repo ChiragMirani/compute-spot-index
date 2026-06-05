@@ -24,7 +24,7 @@ The valuation hook uses B300 prices when available, and otherwise falls back to 
 
 ## Methodology
 
-The public page uses the latest saved snapshot in `data/latest-public.json`.
+The public page uses the saved June 5, 2026 Vast.ai snapshot embedded in `index.html`. The same snapshot is mirrored in `data/latest-public.json` for machine-readable access.
 
 For each graphics processor type:
 
@@ -42,9 +42,11 @@ Present value is calculated on annual surplus after total annualized costs over 
 
 These are public spot-market prices, not hyperscaler procurement costs or net margins. The calculation uses a stylized annualized cost stack rather than site-specific electricity, maintenance, staffing, tax, construction, networking, and procurement contracts. It still excludes downtime, hardware replacement timing beyond Epoch's stylized lifespans, and the risk that rental prices fall as graphics processor supply expands.
 
-## Local Live Refresh
+## Updating Prices
 
-The public GitHub Pages version is static. To refresh the Vast.ai data locally:
+The public GitHub Pages version is static by design. To replace the table with a newer Vast.ai snapshot, refresh the data locally, copy the new prices into `index.html`, and update `data/latest-public.json`.
+
+Local refresh command:
 
 ```powershell
 cd C:\Users\chira\Desktop\sports\datascience\vast-gpu-price-tracker

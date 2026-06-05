@@ -2,13 +2,13 @@
 
 URL: https://chiragmirani.github.io/compute-spot-index/
 
-Compute Spot Index is a public AI compute price tracker. It summarizes public Vast.ai rental offers into median prices per graphics processor-hour, then translates those prices into rough annual rental revenue, annual surplus after total annualized data center costs, and estimated present value for a 100,000-processor AI data center.
+Compute Spot Index is a public AI compute price tracker. It uses a saved Vast.ai rental-offer snapshot to summarize median prices per graphics processor-hour, then translates those prices into rough annual rental revenue, annual surplus after total annualized data center costs, and estimated present value for a 100,000-processor AI data center.
 
 The headline valuation uses B300 prices when available, and otherwise falls back to B200.
 
 Primary data:
 - Public Vast.ai rental offers, normalized to price per graphics processor-hour.
-- Saved public snapshot: https://chiragmirani.github.io/compute-spot-index/data/latest-public.json
+- Saved public snapshot from June 5, 2026: https://chiragmirani.github.io/compute-spot-index/data/latest-public.json
 
 Core formula:
 - Annual rental revenue = median hourly rental price * 100,000 graphics processors * 8,760 hours * 65% utilization.

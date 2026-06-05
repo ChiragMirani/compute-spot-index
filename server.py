@@ -326,17 +326,26 @@ class Handler(BaseHTTPRequestHandler):
 
 def sample_payload() -> dict:
     return {
-        "timestamp": now_iso(),
-        "source": "Sample data until VAST_API_KEY is set",
-        "assumptions": {"verified": True, "rentable": True, "num_gpus": 1, "rental_type": "ondemand"},
+        "timestamp": "2026-06-05T16:36:10+00:00",
+        "source": "Saved Vast.ai Search Offers API snapshot",
+        "assumptions": {
+            "rentable": True,
+            "price_basis": "per full graphics processor-hour",
+            "minimum_host_reliability": "90%",
+            "rental_type": "ondemand",
+            "site_size": "100,000 graphics processors",
+            "utilization": "65%",
+            "discount_rate": "10%-15%",
+            "horizon": "10 years",
+        },
         "rows": [
-            {"gpu": "B300", "offers": 0, "min_price": None, "median_price": None, "p25_price": None, "p75_price": None, "median_reliability": None, "sample_offers": []},
-            {"gpu": "B200", "offers": 1, "min_price": 3.94, "median_price": 3.94, "p25_price": 3.94, "p75_price": 3.94, "median_reliability": 99.0, "sample_offers": []},
-            {"gpu": "H100 SXM", "offers": 3, "min_price": 2.53, "median_price": 4.27, "p25_price": 2.53, "p75_price": 5.03, "median_reliability": 99.5, "sample_offers": []},
-            {"gpu": "H100 NVL", "offers": 1, "min_price": 2.86, "median_price": 2.86, "p25_price": 2.86, "p75_price": 2.86, "median_reliability": 96.2, "sample_offers": []},
-            {"gpu": "A100 80GB", "offers": 4, "min_price": 0.88, "median_price": 1.52, "p25_price": 1.07, "p75_price": 1.87, "median_reliability": 99.6, "sample_offers": []},
-            {"gpu": "A100 40GB", "offers": 4, "min_price": 0.80, "median_price": 0.94, "p25_price": 0.87, "p75_price": 1.00, "median_reliability": 99.3, "sample_offers": []},
-            {"gpu": "RTX 5090", "offers": 3, "min_price": 0.58, "median_price": 0.67, "p25_price": 0.58, "p75_price": 2.01, "median_reliability": 98.9, "sample_offers": []},
+            {"gpu": "B300", "offers": 7, "median_price": 6.000185185185186},
+            {"gpu": "B200", "offers": 11, "median_price": 6.238390313390314},
+            {"gpu": "H100 SXM", "offers": 4, "median_price": 2.0005555555555556},
+            {"gpu": "H100 NVL", "offers": 3, "median_price": 2.575555555555555},
+            {"gpu": "A100 80GB", "offers": 16, "median_price": 1.0674074074074074},
+            {"gpu": "A100 40GB", "offers": 12, "median_price": 1.0685185185185184},
+            {"gpu": "RTX 5090", "offers": 72, "median_price": 0.9608796296296298},
         ],
         "errors": [],
     }

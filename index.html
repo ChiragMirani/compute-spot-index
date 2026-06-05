@@ -475,33 +475,6 @@
         padding: 13px 15px;
       }
 
-      .key-panel {
-        display: none;
-        margin-bottom: 22px;
-        border-top: 1px solid var(--line);
-        border-bottom: 1px solid var(--line);
-        padding: 16px 0;
-      }
-
-      .key-panel.visible {
-        display: block;
-      }
-
-      .key-row {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 10px;
-        margin-top: 10px;
-      }
-
-      .key-row input {
-        min-height: 38px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 0 11px;
-        font: inherit;
-      }
-
       @media (max-width: 980px) {
         .hero,
         .note {
@@ -557,23 +530,13 @@
 
         <div id="errorBox" class="error"></div>
 
-        <section id="keyPanel" class="key-panel">
-          <p class="timestamp">
-            Paste a Vast.ai API key to fetch live prices. It is sent only to this local server at 127.0.0.1 and kept in memory for this session.
-          </p>
-          <div class="key-row">
-            <input id="apiKeyInput" type="password" autocomplete="off" placeholder="Vast.ai API key" />
-            <button id="saveKeyButton" type="button">Use Key</button>
-          </div>
-        </section>
-
         <section class="panel">
           <div class="panel-head">
             <div>
               <h2>Current Spot Prices</h2>
               <p class="timestamp">Rentable on-demand offers with at least 90% host reliability. Multi-processor listings are normalized to price per graphics processor-hour.</p>
             </div>
-            <span class="chip" id="sourceLabel">Vast.ai</span>
+            <span class="chip" id="sourceLabel">Saved Vast.ai snapshot</span>
           </div>
           <p class="scope-note">
             <strong>Table scope:</strong> this is a 100,000 full-graphics-processor AI data center model. Annual rental revenue uses Vast.ai on-demand full-processor-hour prices and 65% utilization; annual surplus subtracts Epoch's scaled annualized data-center cost stack.
@@ -623,10 +586,6 @@
       const timestamp = document.getElementById("timestamp");
       const sourceLabel = document.getElementById("sourceLabel");
       const valuationNote = document.getElementById("valuationNote");
-      const keyPanel = document.getElementById("keyPanel");
-      const apiKeyInput = document.getElementById("apiKeyInput");
-      const saveKeyButton = document.getElementById("saveKeyButton");
-      const isLocalServer = location.hostname === "127.0.0.1" || location.hostname === "localhost";
       const graphicsProcessorCount = 100000;
       const hoursPerYear = 8760;
       const utilization = 0.65;
@@ -656,29 +615,29 @@
       const annualOperatingCost = epochOneGigawattOperatingCost * (siteInformationTechnologyPowerMegawatts / 1000);
       const annualTotalCost = epochOneGigawattTotalAnnualCost * (siteInformationTechnologyPowerMegawatts / 1000);
       const annualizedCapitalCost = annualTotalCost - annualOperatingCost;
+      const savedSnapshot = {
+        timestamp: "2026-06-05T16:36:10+00:00",
+        source: "Saved Vast.ai Search Offers API snapshot",
+        rows: [
+          { gpu: "B300", offers: 7, median_price: 6.000185185185186 },
+          { gpu: "B200", offers: 11, median_price: 6.238390313390314 },
+          { gpu: "H100 SXM", offers: 4, median_price: 2.0005555555555556 },
+          { gpu: "H100 NVL", offers: 3, median_price: 2.575555555555555 },
+          { gpu: "A100 80GB", offers: 16, median_price: 1.0674074074074074 },
+          { gpu: "A100 40GB", offers: 12, median_price: 1.0685185185185184 },
+          { gpu: "RTX 5090", offers: 72, median_price: 0.9608796296296298 },
+        ],
+      };
 
-      async function loadPrices() {
+      function loadPrices() {
         errorBox.style.display = "none";
-        try {
-          const endpoint = isLocalServer ? "/api/latest?auto=1" : "data/latest-public.json";
-          const response = await fetch(endpoint);
-          const payload = await response.json();
-          if (!response.ok || payload.error) {
-            showError(payload.error || "Could not refresh prices. Showing sample data.");
-            render(payload.sample || payload);
-          } else {
-            render(payload);
-          }
-        } catch (error) {
-          showError(error.message);
-        }
+        render(savedSnapshot);
       }
 
       function render(payload) {
         const rows = (payload.rows || []).filter((row) => row.median_price != null);
-        const maxMedian = Math.max(...rows.map((row) => Number(row.median_price || 0)), 1);
         timestamp.textContent = `Snapshot: ${formatDate(payload.timestamp)}`;
-        sourceLabel.textContent = payload.source && payload.source.includes("Sample") ? "Sample data" : "Vast.ai API";
+        sourceLabel.textContent = "Saved Vast.ai snapshot";
 
         priceRows.innerHTML = rows
           .map((row) => {
@@ -723,14 +682,7 @@
             </div>
           `;
         } else {
-          valuationNote.textContent = "Refresh with a Vast.ai API key to compute the B300 or B200 valuation hook.";
-        }
-
-        if (payload.refresh_error) {
-          showError(`Could not update from Vast.ai, showing last saved data. ${payload.refresh_error}`);
-          if (isLocalServer) keyPanel.classList.add("visible");
-        } else {
-          keyPanel.classList.remove("visible");
+          valuationNote.textContent = "Add a B300 or B200 price to compute the valuation hook.";
         }
       }
 
@@ -785,42 +737,7 @@
         return annualGrossValue(medianPrice) - annualTotalCost;
       }
 
-      async function saveKey() {
-        const apiKey = apiKeyInput.value.trim();
-        if (!apiKey) {
-          showError("Paste a Vast.ai API key first.");
-          return;
-        }
-        saveKeyButton.disabled = true;
-        saveKeyButton.textContent = "Saving...";
-        try {
-          const response = await fetch("/api/key", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ apiKey }),
-          });
-          const payload = await response.json();
-          if (!response.ok || payload.error) throw new Error(payload.error || "Could not save key.");
-          apiKeyInput.value = "";
-          keyPanel.classList.remove("visible");
-          await loadPrices();
-        } catch (error) {
-          showError(error.message);
-        } finally {
-          saveKeyButton.disabled = false;
-          saveKeyButton.textContent = "Use Key";
-        }
-      }
-
-      saveKeyButton.addEventListener("click", saveKey);
-      apiKeyInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") saveKey();
-      });
       loadPrices();
-
-      if (window.location.protocol === "file:") {
-        showError("Open this through the local server instead: http://127.0.0.1:8788. The file:// page cannot call the Vast.ai backend.");
-      }
     </script>
   </body>
 </html>
