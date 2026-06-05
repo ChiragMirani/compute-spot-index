@@ -14,6 +14,8 @@ Live page: https://chiragmirani.github.io/compute-spot-index/
 - Estimated present value of 10-year surplus using a 10%-15% discount rate
 - A cost analogy using Epoch AI's one-gigawatt AI data center cost estimate
 
+The valuation hook uses B300 prices when available, and otherwise falls back to B200.
+
 ## Data Sources
 
 - Vast.ai Search Offers API for public rental-market prices

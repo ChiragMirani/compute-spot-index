@@ -20,6 +20,7 @@ VAST_BUNDLES_URL = "https://console.vast.ai/api/v0/bundles/"
 RUNTIME_API_KEY = ""
 
 GPU_QUERIES = [
+    {"label": "B300", "queries": ["B300", "GB300"]},
     {"label": "B200", "queries": ["B200"]},
     {"label": "H100 SXM", "queries": ["H100 SXM", "H100 SXM5"]},
     {"label": "H100 NVL", "queries": ["H100 NVL"]},
@@ -82,7 +83,7 @@ def fetch_offers_for_gpu(gpu: dict, api_key: str) -> list[dict]:
         body = {
             "rentable": {"eq": True},
             "gpu_name": {"eq": query},
-            "type": "on-demand",
+            "type": "ondemand",
             "order": [["dph_total", "asc"]],
             "limit": 200,
         }
@@ -100,9 +101,12 @@ def fetch_offers_for_gpu(gpu: dict, api_key: str) -> list[dict]:
 def keep_offer(offer: dict, gpu: dict) -> bool:
     vram = first_number(offer, ["gpu_ram", "gpu_total_ram", "gpu_vram", "gpu_mem"], divisor=1024)
     reliability = first_number(offer, ["reliability2", "reliability", "host_reliability"])
+    gpu_fraction = first_number(offer, ["gpu_frac"], divisor=1)
     if reliability is not None and reliability <= 1:
         reliability *= 100
     if reliability is not None and reliability < 90:
+        return False
+    if gpu_fraction is not None and gpu_fraction < 0.99:
         return False
     if gpu.get("min_vram_gb") is not None and vram is not None and vram < gpu["min_vram_gb"]:
         return False
@@ -186,9 +190,9 @@ def collect_snapshot() -> dict:
         "source": "Vast.ai Search Offers API",
         "assumptions": {
             "rentable": True,
-            "price_basis": "per graphics processor-hour",
+            "price_basis": "per full graphics processor-hour",
             "minimum_host_reliability": "90%",
-            "rental_type": "on-demand",
+            "rental_type": "ondemand",
         },
         "rows": rows,
         "errors": errors,
@@ -324,8 +328,9 @@ def sample_payload() -> dict:
     return {
         "timestamp": now_iso(),
         "source": "Sample data until VAST_API_KEY is set",
-        "assumptions": {"verified": True, "rentable": True, "num_gpus": 1, "rental_type": "on-demand"},
+        "assumptions": {"verified": True, "rentable": True, "num_gpus": 1, "rental_type": "ondemand"},
         "rows": [
+            {"gpu": "B300", "offers": 0, "min_price": None, "median_price": None, "p25_price": None, "p75_price": None, "median_reliability": None, "sample_offers": []},
             {"gpu": "B200", "offers": 1, "min_price": 3.94, "median_price": 3.94, "p25_price": 3.94, "p75_price": 3.94, "median_reliability": 99.0, "sample_offers": []},
             {"gpu": "H100 SXM", "offers": 3, "min_price": 2.53, "median_price": 4.27, "p25_price": 2.53, "p75_price": 5.03, "median_reliability": 99.5, "sample_offers": []},
             {"gpu": "H100 NVL", "offers": 1, "min_price": 2.86, "median_price": 2.86, "p25_price": 2.86, "p75_price": 2.86, "median_reliability": 96.2, "sample_offers": []},

@@ -10,7 +10,7 @@
     />
     <meta
       name="keywords"
-      content="AI compute, GPU rental prices, B200 price, H100 price, data center valuation, Vast.ai, AI infrastructure, compute economics"
+      content="AI compute, GPU rental prices, B300 price, B200 price, H100 price, data center valuation, Vast.ai, AI infrastructure, compute economics"
     />
     <meta name="author" content="Chirag Mirani" />
     <meta name="robots" content="index, follow" />
@@ -683,15 +683,15 @@
           })
           .join("");
 
-        const b200 = rows.find((row) => row.gpu === "B200");
+        const valuationGpu = rows.find((row) => row.gpu === "B300") || rows.find((row) => row.gpu === "B200");
 
-        if (b200 && b200.median_price) {
-          const annualGross100k = annualGrossValue(b200.median_price);
-          const annualAfterTotalCost = annualValueAfterTotalAnnualCost(b200.median_price);
+        if (valuationGpu && valuationGpu.median_price) {
+          const annualGross100k = annualGrossValue(valuationGpu.median_price);
+          const annualAfterTotalCost = annualValueAfterTotalAnnualCost(valuationGpu.median_price);
           const presentValueAtTenPercent = presentValue(annualAfterTotalCost, highDiscountRate, valuationYears);
           const presentValueAtFifteenPercent = presentValue(annualAfterTotalCost, lowDiscountRate, valuationYears);
           valuationNote.innerHTML = `
-            <strong>Valuation hook:</strong> at the current B200 median of <strong>${formatCurrency(b200.median_price)} per graphics processor-hour</strong>,
+            <strong>Valuation hook:</strong> at the current ${valuationGpu.gpu} median of <strong>${formatCurrency(valuationGpu.median_price)} per graphics processor-hour</strong>,
             a 100,000 graphics processor data center has rental-market revenue of about <strong>${formatCompactMoney(annualGross100k)} per year</strong>.
             Epoch's annualized cost stack scales to about <strong>${formatCompactMoney(annualTotalCost)} per year</strong> for this 120 megawatt proxy, including <strong>${formatCompactMoney(annualizedCapitalCost)}</strong> of annualized capital cost and <strong>${formatCompactMoney(annualOperatingCost)}</strong> of operating cost.
             After deducting those costs, annual surplus is about <strong>${formatCompactMoney(annualAfterTotalCost)} per year</strong>.
@@ -708,7 +708,7 @@
             </div>
           `;
         } else {
-          valuationNote.textContent = "Refresh with a Vast.ai API key to compute the B200 valuation hook.";
+          valuationNote.textContent = "Refresh with a Vast.ai API key to compute the B300 or B200 valuation hook.";
         }
 
         if (payload.refresh_error) {
